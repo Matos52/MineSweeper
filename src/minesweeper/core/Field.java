@@ -1,32 +1,23 @@
 package minesweeper.core;
 
+import java.util.Random;
+
 /**
  * Field represents playing field and game logic.
  */
 public class Field {
+
     /**
      * Playing field tiles.
      */
     private final Tile[][] tiles;
 
-    /**
-     * Field row count. Rows are indexed from 0 to (rowCount - 1).
-     */
     private final int rowCount;
 
-    /**
-     * Column count. Columns are indexed from 0 to (columnCount - 1).
-     */
     private final int columnCount;
 
-    /**
-     * Mine count.
-     */
     private final int mineCount;
 
-    /**
-     * Game state.
-     */
     private GameState state = GameState.PLAYING;
 
     /**
@@ -47,6 +38,44 @@ public class Field {
     }
 
     /**
+     * Field row count. Rows are indexed from 0 to (rowCount - 1).
+     */
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    /**
+     * Column count. Columns are indexed from 0 to (columnCount - 1).
+     */
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    /**
+     * Mine count.
+     */
+    public int getMineCount() {
+        return mineCount;
+    }
+
+    /**
+     * Game state.
+     */
+    public GameState getState() {
+        return state;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public Tile getTile(int row, int column) {
+        Tile tile = tiles[row][column];
+        return tile;
+    }
+
+
+    /**
      * Opens tile at specified indeces.
      *
      * @param row    row number
@@ -57,12 +86,12 @@ public class Field {
         if (tile.getState() == Tile.State.CLOSED) {
             tile.setState(Tile.State.OPEN);
             if (tile instanceof Mine) {
-                state = GameState.FAILED;
+                setState(GameState.FAILED);
                 return;
             }
 
             if (isSolved()) {
-                state = GameState.SOLVED;
+                setState(GameState.SOLVED);
                 return;
             }
         }
@@ -75,7 +104,14 @@ public class Field {
      * @param column column number
      */
     public void markTile(int row, int column) {
-        throw new UnsupportedOperationException("Method markTile not yet implemented");
+//        throw new UnsupportedOperationException("Method markTile not yet implemented");
+        Tile tile = tiles[row][column];
+        if(tile.getState() == Tile.State.CLOSED) {
+            tile.setState(Tile.State.MARKED);
+        }
+        if(tile.getState() == Tile.State.MARKED) {
+            tile.setState(Tile.State.CLOSED);
+        }
     }
 
     /**
@@ -83,6 +119,18 @@ public class Field {
      */
     private void generate() {
 //        throw new UnsupportedOperationException("Method generate not yet implemented");
+        Random r = new Random();
+        Tile[][] tile = new Tile[1][];
+
+        int n1;
+        int n2;
+
+        for (int i = 0; i < this.rowCount; i++) {
+            n1 = r.nextInt(this.rowCount);
+            n2 = r.nextInt(this.columnCount);
+            Mine mine = tile[n1][n2];
+        }
+        
     }
 
     /**
@@ -105,10 +153,10 @@ public class Field {
         int count = 0;
         for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
             int actRow = row + rowOffset;
-            if (actRow >= 0 && actRow < rowCount) {
+            if (actRow >= 0 && actRow < getRowCount()) {
                 for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
                     int actColumn = column + columnOffset;
-                    if (actColumn >= 0 && actColumn < columnCount) {
+                    if (actColumn >= 0 && actColumn < getColumnCount()) {
                         if (tiles[actRow][actColumn] instanceof Mine) {
                             count++;
                         }
