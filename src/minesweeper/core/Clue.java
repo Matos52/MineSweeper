@@ -3,9 +3,10 @@ package minesweeper.core;
 /**
  * Clue tile.
  */
-public class Clue extends Tile {
+public class Clue  extends Tile {
+    /** Value of the clue. */
     private final int value;
-    
+
     /**
      * Constructor.
      * @param value  value of the clue
@@ -14,13 +15,12 @@ public class Clue extends Tile {
         this.value = value;
     }
 
-    /** Value of the clue. */
     public int getValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.valueOf(value);
     }
 }

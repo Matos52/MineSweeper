@@ -6,18 +6,29 @@ import java.util.Random;
  * Field represents playing field and game logic.
  */
 public class Field {
-
     /**
      * Playing field tiles.
      */
     private final Tile[][] tiles;
 
+    /**
+     * Field row count. Rows are indexed from 0 to (rowCount - 1).
+     */
     private final int rowCount;
 
+    /**
+     * Column count. Columns are indexed from 0 to (columnCount - 1).
+     */
     private final int columnCount;
 
+    /**
+     * Mine count.
+     */
     private final int mineCount;
 
+    /**
+     * Game state.
+     */
     private GameState state = GameState.PLAYING;
 
     /**
@@ -36,25 +47,17 @@ public class Field {
         //generate the field content
         generate();
 
-        for (int r = 0; r < this.rowCount; r++) {
-            for (int i = 0; i < this.columnCount; i++) {
-                if(tiles[r][i] instanceof Mine) {
-                    System.out.print("X ");
-
-                } else if(tiles[r][i] instanceof Clue) {
-                    System.out.print(countAdjacentMines(r,i) + " ");
-
-                } else {
-                    System.out.print(tiles[r][i] + " ");
-                }
+        for(Tile[] row : tiles) {
+            for(Tile t : row) {
+                System.out.print(t);
             }
-            System.out.println("\n");
+            System.out.println();
         }
+
+        System.out.println(getNumberOf(Tile.State.CLOSED));
+        System.out.println(tiles.length * tiles[0].length);
     }
 
-    /**
-     * Field row count. Rows are indexed from 0 to (rowCount - 1).
-     */
     public int getRowCount() {
         return rowCount;
     }
@@ -101,12 +104,12 @@ public class Field {
         if (tile.getState() == Tile.State.CLOSED) {
             tile.setState(Tile.State.OPEN);
             if (tile instanceof Mine) {
-                setState(GameState.FAILED);
+                state = GameState.FAILED;
                 return;
             }
 
             if (isSolved()) {
-                setState(GameState.SOLVED);
+                state = GameState.SOLVED;
                 return;
             }
         }
@@ -119,13 +122,10 @@ public class Field {
      * @param column column number
      */
     public void markTile(int row, int column) {
-//        throw new UnsupportedOperationException("Method markTile not yet implemented");
-        Tile tile = tiles[row][column];
-        if(tile.getState() == Tile.State.CLOSED) {
-            tile.setState(Tile.State.MARKED);
-        }
-        if(tile.getState() == Tile.State.MARKED) {
-            tile.setState(Tile.State.CLOSED);
+        if(tiles[row][column].getState() == Tile.State.MARKED) {
+            tiles[row][column].setState(Tile.State.CLOSED);
+        } else {
+            tiles[row][column].setState(Tile.State.MARKED);
         }
     }
 
@@ -133,27 +133,24 @@ public class Field {
      * Generates playing field.
      */
     private void generate() {
-//        throw new UnsupportedOperationException("Method generate not yet implemented");
-        Random r = new Random();
+        Random rand = new Random();
+        int counter = 0, r, c;
 
-        int n1, n2, count = 0;
-
-        while(count < mineCount) {
-            n1 = r.nextInt(this.rowCount);
-            n2 = r.nextInt(this.columnCount);
-            if(tiles[n1][n2] == null) {
-                tiles[n1][n2] = new Mine();
-                count++;
+        while(counter < mineCount) {
+            r = rand.nextInt(rowCount);
+            c = rand.nextInt(columnCount);
+            if(tiles[r][c] == null) {
+                tiles[r][c] = new Mine();
+                counter++;
             }
         }
 
-        for (int i = 0; i < this.rowCount; i++) {
-            for (int j = 0; j < this.columnCount; j++) {
-                if(tiles[i][j] == null) {
-                    tiles[i][j] = new Clue(countAdjacentMines(i,j));
+        for (r = 0; r < rowCount; r++) {
+            for (c = 0; c < columnCount; c++) {
+                if(tiles[r][c] == null) {
+                    tiles[r][c] = new Clue(countAdjacentMines(r, c));
                 }
             }
-
         }
     }
 
@@ -164,6 +161,23 @@ public class Field {
      */
     private boolean isSolved() {
         throw new UnsupportedOperationException("Method isSolved not yet implemented");
+        //počet všetkých dlaždíc - počet odokrytých dlaždíc = počet mín
+
+        if(((tiles.length * tiles[0].length) - getNumberOf(Tile.State.OPEN)) == getMineCount()) {
+            return true;
+        }
+        return false;
+    }
+    private int getNumberOf(Tile.State state) {
+        int counter = 0;
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                if(state == Tile.State.CLOSED) {
+                    counter++;
+                }
+            }
+        }
+        return counter;
     }
 
     /**
@@ -177,10 +191,10 @@ public class Field {
         int count = 0;
         for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
             int actRow = row + rowOffset;
-            if (actRow >= 0 && actRow < getRowCount()) {
+            if (actRow >= 0 && actRow < rowCount) {
                 for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
                     int actColumn = column + columnOffset;
-                    if (actColumn >= 0 && actColumn < getColumnCount()) {
+                    if (actColumn >= 0 && actColumn < columnCount) {
                         if (tiles[actRow][actColumn] instanceof Mine) {
                             count++;
                         }

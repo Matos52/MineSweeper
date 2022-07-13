@@ -5,8 +5,8 @@ package minesweeper.core;
  */
 public class Mine extends Tile {
 
-//    @Override
-//    public String toString() {
-//        return String
-//    }
+    @Override
+    public String toString() {
+        return "X";
+    }
 }
