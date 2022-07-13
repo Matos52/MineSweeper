@@ -35,6 +35,21 @@ public class Field {
 
         //generate the field content
         generate();
+
+        for (int r = 0; r < this.rowCount; r++) {
+            for (int i = 0; i < this.columnCount; i++) {
+                if(tiles[r][i] instanceof Mine) {
+                    System.out.print("X ");
+
+                } else if(tiles[r][i] instanceof Clue) {
+                    System.out.print(countAdjacentMines(r,i) + " ");
+
+                } else {
+                    System.out.print(tiles[r][i] + " ");
+                }
+            }
+            System.out.println("\n");
+        }
     }
 
     /**
@@ -121,15 +136,24 @@ public class Field {
 //        throw new UnsupportedOperationException("Method generate not yet implemented");
         Random r = new Random();
 
-        int n1;
-        int n2;
+        int n1, n2, count = 0;
 
-        for (int i = 0; i < this.mineCount; i++) {
+        while(count < mineCount) {
             n1 = r.nextInt(this.rowCount);
             n2 = r.nextInt(this.columnCount);
             if(tiles[n1][n2] == null) {
-                tiles[n1][n2] = instanceof Mine;
+                tiles[n1][n2] = new Mine();
+                count++;
             }
+        }
+
+        for (int i = 0; i < this.rowCount; i++) {
+            for (int j = 0; j < this.columnCount; j++) {
+                if(tiles[i][j] == null) {
+                    tiles[i][j] = new Clue(countAdjacentMines(i,j));
+                }
+            }
+
         }
     }
 
