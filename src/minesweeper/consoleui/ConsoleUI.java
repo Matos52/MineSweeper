@@ -3,9 +3,12 @@ package minesweeper.consoleui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import minesweeper.UserInterface;
 import minesweeper.core.Field;
+import minesweeper.core.GameState;
 
 /**
  * Console user interface.
@@ -45,12 +48,19 @@ public class ConsoleUI implements UserInterface {
     public void newGameStarted(Field field) {
         this.field = field;
 
-        this.format = "%" + (1 + String.valueOf(field.getColumnCount()).length()) + "s";
+        this.format = "%"
+                + (1 + String.valueOf(field.getColumnCount()).length())
+                + "s";
         do {
             update();
             processInput();
-            throw new UnsupportedOperationException("Resolve the game state - winning or loosing condition.");
+            if(field.getState() == GameState.FAILED) {
+                System.out.println("Ukoncenie hry");
+                System.exit(0);
+            }
         } while (true);
+
+
     }
 
     /**
@@ -81,6 +91,37 @@ public class ConsoleUI implements UserInterface {
      * Reads line from console and does the action on a playing field according to input string.
      */
     private void processInput() {
-        throw new UnsupportedOperationException("Method processInput not yet implemented");
+        //Vypísať požiadavku na zadanie vstupu so vzorom očakávaného vstupu od používateľa: X – ukončenie hry, MA1 – označenie dlaždice v riadku A a stĺpci 1, OB4 – odkrytie dlaždice v riadku B a stĺpci 4.
+        System.out.println("X - ukoncenie hry, MA1 - oznacenie dlazdice v riadku A a stlpci 1, OB4 - odkrytie dlazdice v riadku B a stlpci 4.");
+
+        String line = readLine();
+
+        if(line.equalsIgnoreCase("X")) {
+            field.setState(GameState.FAILED);
+        }
+
+        Pattern pt = Pattern.compile("([M-O])([0-8])([0-8])");
+        Matcher mt = pt.matcher(line);
+
+        boolean result = mt.matches();
+
+        if(result) {
+            System.out.println("Zhoduje sa.");
+            if(mt.group(1).equalsIgnoreCase("O")) {
+                int row = Integer.parseInt(mt.group(2));
+                int column = Integer.parseInt(mt.group(3));
+
+//                field.getTile(row,column) = Tile.State.OPEN;
+            }
+
+            if(mt.group(1).equalsIgnoreCase("M")) {
+                int row = Integer.parseInt(mt.group(2));
+                int column = Integer.parseInt(mt.group(3));
+
+//                field.getTile(row,column) = Tile.State.MARKED;
+            }
+        } else {
+            System.out.println("Nespravne zadanie, zadaj este raz.");
+        }
     }
 }
