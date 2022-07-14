@@ -11,14 +11,21 @@ import minesweeper.core.Field;
  * Console user interface.
  */
 public class ConsoleUI implements UserInterface {
-    /** Playing field. */
+    /**
+     * Playing field.
+     */
     private Field field;
 
-    /** Input reader. */
+    private String format = "%2s";
+
+    /**
+     * Input reader.
+     */
     private BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
     /**
      * Reads line of text from the reader.
+     *
      * @return line as a string
      */
     private String readLine() {
@@ -31,16 +38,19 @@ public class ConsoleUI implements UserInterface {
 
     /**
      * Starts the game.
+     *
      * @param field field of mines and clues
      */
     @Override
     public void newGameStarted(Field field) {
         this.field = field;
+
+        this.format = "%" + (1 + String.valueOf(field.getColumnCount()).length()) + "s";
         do {
             update();
             processInput();
             throw new UnsupportedOperationException("Resolve the game state - winning or loosing condition.");
-        } while(true);
+        } while (true);
     }
 
     /**
@@ -48,24 +58,21 @@ public class ConsoleUI implements UserInterface {
      */
     @Override
     public void update() {
-        System.out.print("   ");
-        for (int i = 1; i < field.getColumnCount() + 1; i++) {
-            System.out.printf(i + "  ");
+        System.out.println("Metoda update():");
+
+        System.out.printf(format, "");
+        for (int c = 0; c < field.getColumnCount(); c++) {
+            System.out.printf(format, c);
         }
         System.out.println();
 
-        char c = 'A';
-        System.out.printf(c + "  ");
-        for (int i = 0; i < field.getRowCount(); i++) {
-            for (int j = 0; j < field.getColumnCount(); j++) {
-                System.out.printf(field.getTile(i,j).toString() + "  ");
+        //vypis riadky so zvislo osou na zaciatku
+        for (int r = 0; r < field.getRowCount(); r++) {
+            System.out.printf(format, (char)(r + 65));
+            for (int c = 0; c < field.getColumnCount(); c++) {
+                System.out.printf(format, field.getTile(r, c));
             }
-            if(i < field.getRowCount() - 1) {
-                c = (char) (i + 66);
-                System.out.println("\n");
-                System.out.printf(c + "  ");
-            }
-
+            System.out.println();
         }
     }
 

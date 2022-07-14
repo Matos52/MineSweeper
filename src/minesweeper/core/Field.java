@@ -160,13 +160,8 @@ public class Field {
      * @return true if game is solved, false otherwise
      */
     private boolean isSolved() {
-        throw new UnsupportedOperationException("Method isSolved not yet implemented");
         //počet všetkých dlaždíc - počet odokrytých dlaždíc = počet mín
-
-        if(((tiles.length * tiles[0].length) - getNumberOf(Tile.State.OPEN)) == getMineCount()) {
-            return true;
-        }
-        return false;
+        return (rowCount * columnCount - getNumberOf(Tile.State.OPEN)) == mineCount;
     }
     private int getNumberOf(Tile.State state) {
         int counter = 0;
@@ -202,7 +197,6 @@ public class Field {
                 }
             }
         }
-
         return count;
     }
 }
