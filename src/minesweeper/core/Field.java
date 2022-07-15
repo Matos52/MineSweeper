@@ -105,12 +105,14 @@ public class Field {
             tile.setState(Tile.State.OPEN);
             if (tile instanceof Mine) {
                 state = GameState.FAILED;
-                return;
+                System.out.println("Najdena mina!");
+                System.exit(0);
             }
 
             if (isSolved()) {
                 state = GameState.SOLVED;
-                return;
+                System.out.println("Vyhral si!");
+                System.exit(0);
             }
         }
     }
