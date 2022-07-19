@@ -46,16 +46,6 @@ public class Field {
 
         //generate the field content
         generate();
-
-        for(Tile[] row : tiles) {
-            for(Tile t : row) {
-                System.out.print(t);
-            }
-            System.out.println();
-        }
-
-        System.out.println(getNumberOf(Tile.State.CLOSED));
-        System.out.println(tiles.length * tiles[0].length);
     }
 
     public int getRowCount() {

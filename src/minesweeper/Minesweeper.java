@@ -9,17 +9,25 @@ import minesweeper.core.Field;
 public class Minesweeper {
     /** User interface. */
     private UserInterface userInterface;
+
+    private long startMillis = System.currentTimeMillis();
  
     /**
      * Constructor.
      */
     private Minesweeper() {
         userInterface = new ConsoleUI();
-//        System.out.println("Hello " + System.getProperty("user.name"));
+        System.currentTimeMillis();
+        System.out.println("Hello " + System.getProperty("user.name"));
         
-        Field field = new Field(9, 9, 25);
+        Field field = new Field(9, 9, 50);
         userInterface.newGameStarted(field);
 
+    }
+
+    public int getPlayingSeconds() {
+        startMillis;
+        return 0;
     }
 
     /**

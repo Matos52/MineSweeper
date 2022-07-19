@@ -49,7 +49,6 @@ public class ConsoleUI implements UserInterface {
     @Override
     public void newGameStarted(Field field) {
         this.field = field;
-
         this.format = "%"
                 + (4 + String.valueOf(field.getColumnCount()).length())
                 + "s";
@@ -57,9 +56,6 @@ public class ConsoleUI implements UserInterface {
             update();
             processInput();
         } while (true);
-
-
-
     }
 
     /**
@@ -89,7 +85,6 @@ public class ConsoleUI implements UserInterface {
      * Reads line from console and does the action on a playing field according to input string.
      */
     private void processInput() {
-
         System.out.println("X - ukoncenie hry, MA1 - oznacenie dlazdice v riadku A a stlpci 1, OB4 - " +
                 "odkrytie dlazdice v riadku B a stlpci 4.");
         String line = readLine().trim().toUpperCase(Locale.ROOT);
@@ -100,7 +95,6 @@ public class ConsoleUI implements UserInterface {
             System.out.println(e.getMessage());
         }
     }
-
     public void handleInput(String input) throws WrongFormatException {
 
         if(input.equalsIgnoreCase("X")) {
@@ -117,11 +111,11 @@ public class ConsoleUI implements UserInterface {
 
         if(result) {
             if(row <= field.getRowCount() && column <= field.getColumnCount()) {
-                if(mt.group(1).equalsIgnoreCase("O")) {
+                if(mt.group(1).equals("O")) {
                     field.openTile(row,column);
                 }
 
-                if(mt.group(1).equalsIgnoreCase("M")) {
+                if(mt.group(1).equals("M")) {
                     field.markTile(row,column);
                 }
             } else {
