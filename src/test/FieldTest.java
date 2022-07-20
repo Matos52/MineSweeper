@@ -82,8 +82,26 @@ public class FieldTest {
 
         field.markTile(rowCheck, columnCheck);
         field.Tile.State.MARKED
-        if()
+
+//            for (int i = 0; i < rowCount; i++) {
+//                for (int j = 0; j < columnCount; j++) {
+//                    if (field.getTile(rowCount, columnCount) instanceof Clue) {
+//                        if(((Clue) field.getTile(rowCount, columnCount)).getValue()>0){
+//                            field.getTile(rowCount,columnCount).setState(Tile.State.OPEN);
+//                        }
+////                    if(((Clue) field.getTile(rowCount, columnCount)).getValue()==0){ //Neotvorí to už priamo len Clues s hodnotou 0, takže je zbytočné pozerať či je typ Clue?
+////                        field.getTile(rowCount,columnCount).setState(Tile.State.OPEN);
+////                    }
+//                        if(field.getTile(rowCount,columnCount).getState()==Tile.State.CLOSED){
+//                            field.getTile(rowCount,columnCount).setState(Tile.State.MARKED);
+//                        }
+//                    }
+//                }
+//            }
+//        assertEquals(field.getTile(rowCount,columnCount).getState(), GameState.PLAYING, "Not playing.");
+//        assertEquals(field.getTile(rowCount,columnCount).getState(), Tile.State.MARKED, "Not marked.");
     }
+
 
 
 //    @Test
