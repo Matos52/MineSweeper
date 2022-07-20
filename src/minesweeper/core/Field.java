@@ -1,5 +1,6 @@
 package minesweeper.core;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -81,7 +82,9 @@ public class Field {
         Tile tile = tiles[row][column];
         if (tile.getState() == Tile.State.CLOSED) {
             tile.setState(Tile.State.OPEN);
+
             if(tile instanceof Clue && ((Clue)tile).getValue() == 0) {
+
                 getOpenAdjacentTiles(row, column);
             }
 
@@ -201,8 +204,10 @@ public class Field {
                 }
             }
         }
+
         return count;
     }
+
     public GameState getState() {
         return state;
     }
