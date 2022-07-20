@@ -1,5 +1,6 @@
 package minesweeper.core;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -52,36 +53,17 @@ public class Field {
         return rowCount;
     }
 
-    /**
-     * Column count. Columns are indexed from 0 to (columnCount - 1).
-     */
     public int getColumnCount() {
         return columnCount;
     }
 
-    /**
-     * Mine count.
-     */
     public int getMineCount() {
         return mineCount;
     }
 
-    /**
-     * Game state.
-     */
-    public GameState getState() {
-        return state;
+    public Tile getTile(int row, int col) {
+        return tiles[row][col];
     }
-
-    public void setState(GameState state) {
-        this.state = state;
-    }
-
-    public Tile getTile(int row, int column) {
-        Tile tile = tiles[row][column];
-        return tile;
-    }
-
 
     /**
      * Opens tile at specified indeces.
@@ -93,16 +75,33 @@ public class Field {
         Tile tile = tiles[row][column];
         if (tile.getState() == Tile.State.CLOSED) {
             tile.setState(Tile.State.OPEN);
+            if(tile instanceof Clue
+                    && ((Clue)tile).getValue() == 0) {
+                getOpenAdjacentTiles(row, column);
+            }
+
             if (tile instanceof Mine) {
                 state = GameState.FAILED;
-                System.out.println("Najdena mina!");
-                System.exit(0);
+                return;
             }
 
             if (isSolved()) {
                 state = GameState.SOLVED;
-                System.out.println("Vyhral si!");
-                System.exit(0);
+                return;
+            }
+        }
+    }
+
+    private void getOpenAdjacentTiles(int row, int column) {
+        for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+            int actRow = row + rowOffset;
+            if (actRow >= 0 && actRow < rowCount) {
+                for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+                    int actColumn = column + columnOffset;
+                    if (actColumn >= 0 && actColumn < columnCount) {
+                        openTile(actRow, actColumn);
+                    }
+                }
             }
         }
     }
@@ -119,6 +118,25 @@ public class Field {
         } else {
             tiles[row][column].setState(Tile.State.MARKED);
         }
+    }
+
+    public int getRemainingMineCount() {
+        return getMineCount() - this.getNumberOf(Tile.State.MARKED);
+    }
+
+    private int getNumberOf(Tile.State state) {
+        int count = 0;
+        for (int r = 0; r < rowCount; r++) {
+//            count += Arrays.asList(tiles[r])
+//                    .stream()
+//                    .filter((Tile t) -> t.getState() == state)
+//                    .count();
+            for(Tile t : tiles[r]) {
+                if(t.getState() == state)
+                    count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -151,22 +169,10 @@ public class Field {
      *
      * @return true if game is solved, false otherwise
      */
-    private boolean isSolved() {
-        //počet všetkých dlaždíc - počet odokrytých dlaždíc = počet mín
-        return (rowCount * columnCount - getNumberOf(Tile.State.OPEN)) == mineCount;
+    public boolean isSolved() {
+        return (rowCount * columnCount) - mineCount
+                == getNumberOf(Tile.State.OPEN);
     }
-    private int getNumberOf(Tile.State state) {
-        int counter = 0;
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                if(state == Tile.State.CLOSED) {
-                    counter++;
-                }
-            }
-        }
-        return counter;
-    }
-
     /**
      * Returns number of adjacent mines for a tile at specified position in the field.
      *
@@ -189,6 +195,11 @@ public class Field {
                 }
             }
         }
+
         return count;
+    }
+
+    public GameState getState() {
+        return state;
     }
 }
