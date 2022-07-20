@@ -1,8 +1,6 @@
-package minesweeper;
+package minesweeper.core;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Player times.
@@ -25,15 +23,21 @@ public class BestTimes implements Iterable<BestTimes.PlayerTime> {
      * @param time player time in seconds
      */
     public void addPlayerTime(String name, int time) {
-        throw new UnsupportedOperationException("Method addPlayerTime not yet implemented");
+        playerTimes.add(new PlayerTime(name,time));
+        Collections.sort(playerTimes);
     }
 
     /**
      * Returns a string representation of the object.
      * @return a string representation of the object
      */
+    @Override
     public String toString() {
-        throw new UnsupportedOperationException("Method toString not yet implemented");
+        Formatter f = new Formatter();
+        playerTimes
+                .stream()
+                .forEach(pt -> f.format(pt.getName()+" "+pt.getTime()+"%n"));
+        return f.toString();
     }
 
     /**
@@ -46,14 +50,6 @@ public class BestTimes implements Iterable<BestTimes.PlayerTime> {
         /** Playing time in seconds. */
         private final int time;
 
-        public String getName() {
-            return name;
-        }
-
-        public int getTime() {
-            return time;
-        }
-
         /**
          * Constructor.
          * @param name player name
@@ -64,9 +60,18 @@ public class BestTimes implements Iterable<BestTimes.PlayerTime> {
             this.time = time;
         }
 
+        public String getName() {
+            return name;
+        }
+
+        public int getTime() {
+            return time;
+        }
+
         @Override
         public int compareTo(PlayerTime o) {
-            return this.time - o.time;
+            return Integer.compare(this.getTime(), o.getTime());
+//            return this.getTime() - o.getTime();
         }
     }
 }
