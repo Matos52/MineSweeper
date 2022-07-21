@@ -1,7 +1,6 @@
 package test;
 
 import minesweeper.core.*;
-
 import java.util.Random;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -74,11 +73,26 @@ public class FieldTest {
         // Najst si v poli dlazdicu s hodnotou 0, otvorit a checknut
         // , ci su otvorene len dlazdice typu Clue a ci stav pola zostava nadalej PLAYING
 
-        if(tile instanceof Clue && ((Clue) tile).getValue() == 0) {
+        if(tile instanceof Clue) {
+            Clue c = (Clue) tile;
             assertEquals(GameState.PLAYING, field.getState());
+            //...
+            if(c.getValue() == 0) {
+
+            } else {
+
+            }
         }
 
         // Marknut si akukolvek neotvorenu dlazdicu a skusit si na nej open, ci ostava marknuta.
+
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                if (field.getTile(rowCount, columnCount) instanceof Clue && ((Clue) field.getTile(rowCount, columnCount)).getValue()>0) {
+                    field.markTile(rowCheck, columnCheck);
+                }
+            }
+        }
 
         field.markTile(rowCheck, columnCheck);
 //        field.Tile.State.MARKED

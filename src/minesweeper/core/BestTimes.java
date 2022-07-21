@@ -36,7 +36,7 @@ public class BestTimes implements Iterable<BestTimes.PlayerTime> {
         Formatter f = new Formatter();
         playerTimes
                 .stream()
-                .forEach(pt -> f.format(pt.getName()+" "+pt.getTime()+"%n"));
+                .forEach(pt -> f.format(" Player " + pt.getName()+" played game " + pt.getTime() + "s." +"%n"));
         return f.toString();
     }
 

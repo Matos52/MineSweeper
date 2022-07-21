@@ -179,8 +179,7 @@ public class Field {
      * @return true if game is solved, false otherwise
      */
     public boolean isSolved() {
-        return (rowCount * columnCount) - mineCount
-                == getNumberOf(Tile.State.OPEN);
+        return (rowCount * columnCount) - mineCount == getNumberOf(Tile.State.OPEN);
     }
     /**
      * Returns number of adjacent mines for a tile at specified position in the field.

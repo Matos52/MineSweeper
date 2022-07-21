@@ -53,16 +53,12 @@ public class ConsoleUI implements UserInterface {
 
             if (field.getState() == GameState.FAILED) {
                 System.out.println("Odkryl si minu. Prehral si");
-                Minesweeper.getInstance().getBestTimes().addPlayerTime(System.getProperty("user.name"),
-                        Minesweeper.getInstance().getPlayingSeconds());
                 break;
             }
             if (field.getState() == GameState.SOLVED) {
                 System.out.println("Vyhral si");
-                System.out.println(
-                        Minesweeper.getInstance().getBestTimes()
-
-                );
+                Minesweeper.getInstance().getBestTimes().addPlayerTime(System.getProperty("user.name"), Minesweeper.getInstance().getPlayingSeconds());
+                System.out.println(Minesweeper.getInstance().getBestTimes());
                 break;
             }
         } while (true);
@@ -76,9 +72,7 @@ public class ConsoleUI implements UserInterface {
     @Override
     public void update() {
         //System.out.println("Metoda update():");
-        System.out.printf("Cas hrania: %d%n",
-                Minesweeper.getInstance().getPlayingSeconds()
-        );
+        System.out.printf("Cas hrania: %d%n", Minesweeper.getInstance().getPlayingSeconds());
         System.out.printf("Pocet poli neoznacenych ako mina je %s (pocet min: %s)%n", field.getRemainingMineCount(), field.getMineCount());
 
         //vypis horizontalnu os
@@ -109,7 +103,7 @@ public class ConsoleUI implements UserInterface {
         System.out.println("Ocakavany vstup:  X – ukončenie hry, M - mark, O - open, U - unmark. Napr.: MA1 – označenie dlaždice v riadku A a stĺpci 1");
         String playerInput = readLine();
 
-        if(playerInput.trim().equals('X')) {
+        if(playerInput.trim().equalsIgnoreCase("X")) {
             System.out.println("Ukoncujem hru");
             System.exit(0);
         }

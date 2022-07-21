@@ -34,10 +34,10 @@ public class Minesweeper {
         bestTimes.addPlayerTime("Janko", 9);
         bestTimes.addPlayerTime("Janko", 7);
         bestTimes.addPlayerTime("Janko", 3);
-        bestTimes.addPlayerTime("Janko", 8);
+        bestTimes.addPlayerTime("Janko", 25);
 
         userInterface = new ConsoleUI();
-        Field field = new Field(9, 9, 10);
+        Field field = new Field(9, 9, 0);
         userInterface.newGameStarted(field);
     }
 

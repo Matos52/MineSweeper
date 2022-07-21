@@ -1,0 +1,51 @@
+package minesweeper;
+
+import minesweeper.core.Field;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Settings implements Serializable {
+
+    private final int rowCount;
+    private final int columnCount;
+    private final int mineCount;
+
+    public static final Settings BEGINNER = new Settings(9,9,10);
+    public static final Settings INTERMEDIATE = new Settings(9,9,10);
+    public static final Settings EXPERT = new Settings(9,9,10);
+
+    private static final String SETTING_FILE = System.getProperty("user.home") + System.getProperty("file.separator") + "minesweeper.settings";
+
+
+    public Settings(int rowCount, int columnCount, int mineCount) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+        this.mineCount = mineCount;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    public int getMineCount() {
+        return mineCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Settings settings = (Settings) o;
+        return rowCount == settings.rowCount && columnCount == settings.columnCount && mineCount == settings.mineCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rowCount, columnCount, mineCount);
+    }
+}
