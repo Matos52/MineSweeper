@@ -53,6 +53,8 @@ public class ConsoleUI implements UserInterface {
 
             if (field.getState() == GameState.FAILED) {
                 System.out.println("Odkryl si minu. Prehral si");
+                Minesweeper.getInstance().getBestTimes().addPlayerTime(System.getProperty("user.name"),
+                        Minesweeper.getInstance().getPlayingSeconds());
                 break;
             }
             if (field.getState() == GameState.SOLVED) {
