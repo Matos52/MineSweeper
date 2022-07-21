@@ -81,43 +81,39 @@ public class FieldTest {
         // Marknut si akukolvek neotvorenu dlazdicu a skusit si na nej open, ci ostava marknuta.
 
         field.markTile(rowCheck, columnCheck);
-        field.Tile.State.MARKED
+//        field.Tile.State.MARKED
 
-//            for (int i = 0; i < rowCount; i++) {
-//                for (int j = 0; j < columnCount; j++) {
-//                    if (field.getTile(rowCount, columnCount) instanceof Clue) {
-//                        if(((Clue) field.getTile(rowCount, columnCount)).getValue()>0){
-//                            field.getTile(rowCount,columnCount).setState(Tile.State.OPEN);
-//                        }
-////                    if(((Clue) field.getTile(rowCount, columnCount)).getValue()==0){ //Neotvorí to už priamo len Clues s hodnotou 0, takže je zbytočné pozerať či je typ Clue?
-////                        field.getTile(rowCount,columnCount).setState(Tile.State.OPEN);
-////                    }
-//                        if(field.getTile(rowCount,columnCount).getState()==Tile.State.CLOSED){
-//                            field.getTile(rowCount,columnCount).setState(Tile.State.MARKED);
-//                        }
-//                    }
-//                }
-//            }
-//        assertEquals(field.getTile(rowCount,columnCount).getState(), GameState.PLAYING, "Not playing.");
-//        assertEquals(field.getTile(rowCount,columnCount).getState(), Tile.State.MARKED, "Not marked.");
+            for (int i = 0; i < rowCount; i++) {
+                for (int j = 0; j < columnCount; j++) {
+                    if (field.getTile(rowCount, columnCount) instanceof Clue && ((Clue) field.getTile(rowCount, columnCount)).getValue()>0) {
+                        if(((Clue) field.getTile(rowCount, columnCount)).getValue()>0){
+                            field.getTile(rowCount,columnCount).setState(Tile.State.OPEN);
+                        }
+
+                        if(field.getTile(rowCount,columnCount).getState()==Tile.State.CLOSED){
+                            field.getTile(rowCount,columnCount).setState(Tile.State.MARKED);
+                        }
+                    }
+                }
+            }
+        assertEquals(field.getTile(rowCount,columnCount).getState(), GameState.PLAYING, "Not playing.");
+        assertEquals(field.getTile(rowCount,columnCount).getState(), Tile.State.MARKED, "Not marked.");
     }
 
 
 
-//    @Test
-//    public void fieldWithTooManyMines() {
-//        Field fieldWithTooManyMines = null;
-//        int higherMineCount = rowCount * columnCount + randomGenerator.nextInt(10) + 1;
-//        try {
-//            fieldWithTooManyMines = new Field(rowCount, columnCount, higherMineCount);
-//        } catch (Exception e) {
-//            // field with more mines than tiles should not be created - it may fail on exception
-//        }
-//        assertTrue((fieldWithTooManyMines == null)
-//                || (fieldWithTooManyMines.getMineCount()
-//                <= (rowCount * columnCount)));
-//    }
-
-    // ... dalsie testy
+    @Test
+    public void fieldWithTooManyMines() {
+        Field fieldWithTooManyMines = null;
+        int higherMineCount = rowCount * columnCount + randomGenerator.nextInt(10) + 1;
+        try {
+            fieldWithTooManyMines = new Field(rowCount, columnCount, higherMineCount);
+        } catch (Exception e) {
+            // field with more mines than tiles should not be created - it may fail on exception
+        }
+        assertTrue((fieldWithTooManyMines == null)
+                || (fieldWithTooManyMines.getMineCount()
+                <= (rowCount * columnCount)));
+    }
 }
 
