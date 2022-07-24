@@ -1,5 +1,7 @@
 package minesweeper.core;
 
+import minesweeper.Minesweeper;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -90,11 +92,15 @@ public class Field {
 
             if (tile instanceof Mine) {
                 state = GameState.FAILED;
+                System.out.println("Nasiel si minu");
+                System.exit(0);
                 return;
             }
 
             if (isSolved()) {
                 state = GameState.SOLVED;
+                System.out.println("Vyhral si hru");
+                System.exit(0);
                 return;
             }
         }
