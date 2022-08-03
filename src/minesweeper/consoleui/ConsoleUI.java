@@ -3,14 +3,20 @@ package minesweeper.consoleui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLOutput;
+import java.text.NumberFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import entity.Score;
 import minesweeper.Minesweeper;
 import minesweeper.Settings;
 import minesweeper.core.Field;
 import minesweeper.core.GameState;
 import minesweeper.core.Tile;
+import service.ScoreService;
+import service.ScoreServiceJDBC;
 
 /**
  * Console user interface.
@@ -26,6 +32,11 @@ public class ConsoleUI implements UserInterface {
      * Input reader.
      */
     private BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+    /**
+     * name of the player
+     */
+    private String userName ="";
 
     /**
      * Reads line of text from the reader.
@@ -47,46 +58,66 @@ public class ConsoleUI implements UserInterface {
      */
     @Override
     public void newGameStarted(Field field) {
+
+        int gameScore=0;
+
         this.field = field;
-        System.out.println("Chces si zvolit obtiaznost hry?");
-        System.out.println("(1) Beginner,(2) Intermediate, (3) Expert, (Enter) Default");
+        System.out.println("Zadaj svoje meno:");
+        userName = readLine();
+        System.out.println("Vyber obtiaznost:");
+        System.out.println("(1) BEGINNER, (2) INTERMEDIATE, (3) EXPERT, (ENTER) NECHAT DEFAULT");
         String level = readLine();
-        if(level != null && !level.equals("")){
+        if(level != null && !level.equals("")) {
             try {
                 int intLevel = Integer.parseInt(level);
-                Settings s = Settings.BEGINNER;
-                switch (intLevel) {
-                    case 1:
-                        s = Settings.BEGINNER;
-                        break;
-                    case 2:
-                        s = Settings.INTERMEDIATE;
-                        break;
-                    case 3:
-                        s = Settings.EXPERT;
-                        break;
-                    default:
-                        s = Settings.BEGINNER;
+                Settings s = switch (intLevel) {
+                    case 2 -> Settings.INTERMEDIATE;
+                    case 3 -> Settings.EXPERT;
+                    default -> Settings.BEGINNER;
                 };
                 Minesweeper.getInstance().setSetting(s);
                 this.field = new Field(s.getRowCount(), s.getColumnCount(), s.getMineCount());
-
             } catch (NumberFormatException e) {
                 //empty naschval
             }
         }
+
         do {
             update();
             processInput();
 
-            if (field.getState() == GameState.FAILED) {
-                System.out.println("Odkryl si minu. Prehral si");
+            var fieldState=this.field.getState();
+
+            ScoreService service = new ScoreServiceJDBC();
+            var scores = service.getBestScores("minesweeper");
+
+            if (fieldState == GameState.FAILED) {
+                System.out.println(userName+", odkryl si minu. Prehral si. Tvoje skore je "+gameScore+".");
+
+                service.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+
+                System.out.println("Top 5 Players:");
+                for (int i = 0; i < scores.toArray().length; i++) {
+                    System.out.println((i + 1) + ". " +scores.get(i));
+                }
+
                 break;
             }
-            if (field.getState() == GameState.SOLVED) {
-                System.out.println("Vyhral si");
-                Minesweeper.getInstance().getBestTimes().addPlayerTime(System.getProperty("user.name"), Minesweeper.getInstance().getPlayingSeconds());
-                System.out.println(Minesweeper.getInstance().getBestTimes());
+            if (fieldState == GameState.SOLVED) {
+                gameScore=this.field.getScore();
+                System.out.println(userName+", vyhral si. Tvoje skore je "+gameScore+".");
+
+                service.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+
+                System.out.println("Top 5 Players:");
+                for (int i = 0; i < scores.toArray().length; i++) {
+                    System.out.println((i + 1) + ". " +scores.get(i));
+                }
+
+
+                System.out.println(
+                        Minesweeper.getInstance().getBestTimes()
+                );
                 break;
             }
         } while (true);
@@ -100,7 +131,9 @@ public class ConsoleUI implements UserInterface {
     @Override
     public void update() {
         //System.out.println("Metoda update():");
-        System.out.printf("Cas hrania: %d%n", Minesweeper.getInstance().getPlayingSeconds());
+        System.out.printf("Cas hrania: %d%n",
+                field.getPlayTimeInSeconds()
+        );
         System.out.printf("Pocet poli neoznacenych ako mina je %s (pocet min: %s)%n", field.getRemainingMineCount(), field.getMineCount());
 
         //vypis horizontalnu os
@@ -128,10 +161,10 @@ public class ConsoleUI implements UserInterface {
      */
     private void processInput() {
         System.out.println("Zadaj svoj vstup.");
-        System.out.println("Ocakavany vstup:  X – ukončenie hry, M - mark, O - open, U - unmark. Napr.: MA1 – označenie dlaždice v riadku A a stĺpci 1");
+        System.out.println("Ocakavany vstup:  X - ukoncenie hry, M - mark, O - open, U - unmark. Napr.: MA1 - oznacenie dlazdice v riadku A a stlpci 1");
         String playerInput = readLine();
 
-        if(playerInput.trim().equalsIgnoreCase("X")) {
+        if(playerInput.trim().equals('X')) {
             System.out.println("Ukoncujem hru");
             System.exit(0);
         }
@@ -143,7 +176,6 @@ public class ConsoleUI implements UserInterface {
             //e.printStackTrace();
             System.out.println(e.getMessage());
             processInput();
-
         }
     }
 
@@ -208,6 +240,7 @@ public class ConsoleUI implements UserInterface {
         if(OPEN_MARK_PATTERN.matcher(playerInput).matches()) {
             doOperation(matcher1.group(1).charAt(0), matcher1.group(2).charAt(0), Integer.parseInt(matcher1.group(3)));
         }
+
     }
 
 }

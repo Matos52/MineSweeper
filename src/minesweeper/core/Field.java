@@ -1,8 +1,5 @@
 package minesweeper.core;
 
-import minesweeper.Minesweeper;
-
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -35,6 +32,11 @@ public class Field {
     private GameState state = GameState.PLAYING;
 
     /**
+     * time when the game started
+     */
+    private long startMillis;
+
+    /**
      * Constructor.
      *
      * @param rowCount    row count
@@ -44,14 +46,7 @@ public class Field {
     public Field(int rowCount, int columnCount, int mineCount) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
-
-        if(mineCount > (rowCount * columnCount)) {
-            throw new ArithmeticException("Too many mines.");
-//            this.mineCount = rowCount * columnCount;
-        } else {
-            this.mineCount = mineCount;
-        }
-
+        this.mineCount = mineCount;
         tiles = new Tile[rowCount][columnCount];
 
         //generate the field content
@@ -84,23 +79,18 @@ public class Field {
         Tile tile = tiles[row][column];
         if (tile.getState() == Tile.State.CLOSED) {
             tile.setState(Tile.State.OPEN);
-
-            if(tile instanceof Clue && ((Clue)tile).getValue() == 0) {
-
+            if(tile instanceof Clue
+                    && ((Clue)tile).getValue() == 0) {
                 getOpenAdjacentTiles(row, column);
             }
 
             if (tile instanceof Mine) {
                 state = GameState.FAILED;
-                System.out.println("Nasiel si minu");
-                System.exit(0);
                 return;
             }
 
             if (isSolved()) {
                 state = GameState.SOLVED;
-                System.out.println("Vyhral si hru");
-                System.exit(0);
                 return;
             }
         }
@@ -127,12 +117,17 @@ public class Field {
      * @param column column number
      */
     public void markTile(int row, int column) {
-        if(tiles[row][column].getState() == Tile.State.MARKED) {
-            tiles[row][column].setState(Tile.State.CLOSED);
-        } else {
-            tiles[row][column].setState(Tile.State.MARKED);
+        if (state == GameState.PLAYING) {
+            var tile = getTile(row, column);
+            if (tile.getState() == Tile.State.CLOSED) {
+                tile.setState(Tile.State.MARKED);
+            } else if (tile.getState() == Tile.State.MARKED) {
+                tile.setState(Tile.State.CLOSED);
+            }
         }
     }
+
+
 
     public int getRemainingMineCount() {
         return getMineCount() - this.getNumberOf(Tile.State.MARKED);
@@ -177,6 +172,8 @@ public class Field {
                 }
             }
         }
+
+        startMillis = System.currentTimeMillis();
     }
 
     /**
@@ -185,7 +182,8 @@ public class Field {
      * @return true if game is solved, false otherwise
      */
     public boolean isSolved() {
-        return (rowCount * columnCount) - mineCount == getNumberOf(Tile.State.OPEN);
+        return (rowCount * columnCount) - mineCount
+                == getNumberOf(Tile.State.OPEN);
     }
     /**
      * Returns number of adjacent mines for a tile at specified position in the field.
@@ -216,4 +214,16 @@ public class Field {
     public GameState getState() {
         return state;
     }
+
+    public int getPlayTimeInSeconds(){
+        return (int) ((System.currentTimeMillis() - startMillis)/1000);
+    }
+
+
+
+    public int getScore() {
+        return rowCount * columnCount * 10 - getPlayTimeInSeconds();
+    }
+
+
 }

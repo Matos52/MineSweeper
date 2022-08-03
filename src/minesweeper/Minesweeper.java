@@ -14,7 +14,7 @@ public class Minesweeper {
 
     private BestTimes bestTimes = new BestTimes();
 
-    private long startMillis = System.currentTimeMillis();
+
     private static Minesweeper instance;
 
     private Settings setting;
@@ -38,9 +38,13 @@ public class Minesweeper {
         bestTimes.addPlayerTime("Janko", 9);
         bestTimes.addPlayerTime("Janko", 7);
         bestTimes.addPlayerTime("Janko", 3);
-        bestTimes.addPlayerTime("Janko", 25);
+        bestTimes.addPlayerTime("Janko", 8);
 
-        Field field = new Field(setting.getRowCount(), setting.getColumnCount(), setting.getMineCount());
+        Field field = new Field(
+                setting.getRowCount(),
+                setting.getColumnCount(),
+                setting.getMineCount()
+        );
 
         userInterface = new ConsoleUI();
         userInterface.newGameStarted(field);
@@ -58,9 +62,7 @@ public class Minesweeper {
         return bestTimes;
     }
 
-    public int getPlayingSeconds() {
-        return (int) ((System.currentTimeMillis() - startMillis)/1000);
-    }
+
 
     public void setSetting(Settings setting) {
         this.setting = setting;
