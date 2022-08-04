@@ -58,6 +58,6 @@ public class Comment implements Serializable {
 //                ", commented_on=" + commented_on +
 //                '}';
 
-        return "Player " +userName+ " in " +game+ " commented:  " +comment+ " in " + commentedOn +"!";
+        return "Player " +userName+ " in " +game+ " commented:  " +comment+ " on " + commentedOn +"!";
     }
 }

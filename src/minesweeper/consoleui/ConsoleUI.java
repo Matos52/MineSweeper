@@ -102,16 +102,21 @@ public class ConsoleUI implements UserInterface {
 
                 scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
 
-                System.out.println("Top 5 Players:");
-                var len= scores.size();
-                for (int i = 0; i < len; i++) {
+                System.out.println("Top 5 hracov:");
+                for (int i = 0; i < scores.size(); i++) {
                     System.out.println((i + 1) + ". " +scores.get(i));
                 }
 
+                System.out.println("Zanechaj komentar k tvojej hre: ");
                 var userComment = readLine();
+                System.out.println();
 
                 commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
-                System.out.println(comments);
+
+                System.out.println("Poslednych 5 komentarov:");
+                for (int i = 0; i < comments.size(); i++) {
+                    System.out.println((i + 1) + ". " +comments.get(i));
+                }
 
                 break;
             }
@@ -121,16 +126,21 @@ public class ConsoleUI implements UserInterface {
 
                 scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
 
-                System.out.println("Top 5 Players:");
-                for (int i = 0; i < scores.toArray().length; i++) {
+                System.out.println("Top 5 hracov:");
+                for (int i = 0; i < scores.size(); i++) {
                     System.out.println((i + 1) + ". " +scores.get(i));
                 }
 
+                System.out.println("Zanechaj komentar k tvojej hre: ");
                 var userComment = readLine();
+                System.out.println();
 
                 commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
-                System.out.println(comments.toString());
 
+                System.out.println("Poslednych 5 komentarov:");
+                for (int i = 0; i < comments.size(); i++) {
+                    System.out.println((i + 1) + ". " +comments.get(i));
+                }
 
                 System.out.println(
                         Minesweeper.getInstance().getBestTimes()

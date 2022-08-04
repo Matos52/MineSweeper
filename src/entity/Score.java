@@ -57,6 +57,6 @@ public class Score implements Serializable {
 //                ", playedOn=" + playedOn +
 //                '}';
 
-        return "Player " +userName+ " in " +game+ " acquired " +points+ " points in " +playedOn+"!";
+        return "Player " +userName+ " in " +game+ " acquired " +points+ " points on " +playedOn+"!";
     }
 }
