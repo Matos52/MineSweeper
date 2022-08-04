@@ -9,12 +9,15 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import entity.Comment;
 import entity.Score;
 import minesweeper.Minesweeper;
 import minesweeper.Settings;
 import minesweeper.core.Field;
 import minesweeper.core.GameState;
 import minesweeper.core.Tile;
+import service.CommentService;
+import service.CommentServiceJDBC;
 import service.ScoreService;
 import service.ScoreServiceJDBC;
 
@@ -88,18 +91,27 @@ public class ConsoleUI implements UserInterface {
 
             var fieldState=this.field.getState();
 
-            ScoreService service = new ScoreServiceJDBC();
-            var scores = service.getBestScores("minesweeper");
+            ScoreService scoreService = new ScoreServiceJDBC();
+            var scores = scoreService.getBestScores("minesweeper");
+
+            CommentService commentService = new CommentServiceJDBC();
+            var comments = commentService.getComments("minesweeper");
 
             if (fieldState == GameState.FAILED) {
                 System.out.println(userName+", odkryl si minu. Prehral si. Tvoje skore je "+gameScore+".");
 
-                service.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+                scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
 
                 System.out.println("Top 5 Players:");
-                for (int i = 0; i < scores.toArray().length; i++) {
+                var len= scores.size();
+                for (int i = 0; i < len; i++) {
                     System.out.println((i + 1) + ". " +scores.get(i));
                 }
+
+                var userComment = readLine();
+
+                commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
+                System.out.println(comments);
 
                 break;
             }
@@ -107,12 +119,17 @@ public class ConsoleUI implements UserInterface {
                 gameScore=this.field.getScore();
                 System.out.println(userName+", vyhral si. Tvoje skore je "+gameScore+".");
 
-                service.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+                scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
 
                 System.out.println("Top 5 Players:");
                 for (int i = 0; i < scores.toArray().length; i++) {
                     System.out.println((i + 1) + ". " +scores.get(i));
                 }
+
+                var userComment = readLine();
+
+                commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
+                System.out.println(comments.toString());
 
 
                 System.out.println(

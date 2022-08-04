@@ -45,28 +45,24 @@ public class CommentServiceTest {
         commentService.reset();
         var date = new Date();
         commentService.addComment(new Comment("minesweeper", "Peto", "Moze byt", date));
-        commentService.addComment(new Comment("minesweeper", "Fero", "Nemoze byt", date));
+        commentService.addComment(new Comment("minesweeper", "Katka", "Nemoze byt", date));
         commentService.addComment(new Comment("minesweeper", "Oliver", "Chod domov", date));
         commentService.addComment(new Comment("minesweeper", "David", "Podme von", date));
 
-        var scores = commentService.getComments("minesweeper");
+        var comments = commentService.getComments("minesweeper");
 
-        assertEquals(3, scores.size());
+        assertEquals(3, comments.size());
 
-        assertEquals("minesweeper", scores.get(0).getGame());
-        assertEquals("Katka", scores.get(0).getUserName());
-        assertEquals(150, scores.get(0).getPoints());
-        assertEquals(date, scores.get(0).getPlayedOn());
+        assertEquals("minesweeper", comments.get(0).getGame());
+        assertEquals("Katka", comments.get(0).getUserName());
+        assertEquals("Nemoze byt", comments.get(0).getComment());
+        assertEquals(date, comments.get(0).getCommentedOn());
 
-        assertEquals("minesweeper", scores.get(1).getGame());
-        assertEquals("Peto", scores.get(1).getUserName());
-        assertEquals(140, scores.get(1).getPoints());
-        assertEquals(date, scores.get(1).getPlayedOn());
+        assertEquals("minesweeper", comments.get(1).getGame());
+        assertEquals("Peto", comments.get(1).getUserName());
+        assertEquals("Moze byt", comments.get(1).getComment());
+        assertEquals(date, comments.get(0).getCommentedOn());
 
-        assertEquals("minesweeper", scores.get(2).getGame());
-        assertEquals("Jergus", scores.get(2).getUserName());
-        assertEquals(100, scores.get(2).getPoints());
-        assertEquals(date, scores.get(2).getPlayedOn());
     }
 }
 
