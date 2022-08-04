@@ -34,7 +34,6 @@ public class ScoreServiceJDBC implements ScoreService {
         } catch (Exception e) {
             throw new GameStudioException(e);
         }
-
     }
 
     @Override
