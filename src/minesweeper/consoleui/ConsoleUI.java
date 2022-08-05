@@ -10,16 +10,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import entity.Comment;
+import entity.Rating;
 import entity.Score;
 import minesweeper.Minesweeper;
 import minesweeper.Settings;
 import minesweeper.core.Field;
 import minesweeper.core.GameState;
 import minesweeper.core.Tile;
-import service.CommentService;
-import service.CommentServiceJDBC;
-import service.ScoreService;
-import service.ScoreServiceJDBC;
+import service.*;
 
 /**
  * Console user interface.
@@ -91,32 +89,12 @@ public class ConsoleUI implements UserInterface {
 
             var fieldState=this.field.getState();
 
-            ScoreService scoreService = new ScoreServiceJDBC();
-            var scores = scoreService.getBestScores("minesweeper");
-
-            CommentService commentService = new CommentServiceJDBC();
-            var comments = commentService.getComments("minesweeper");
-
             if (fieldState == GameState.FAILED) {
                 System.out.println(userName+", odkryl si minu. Prehral si. Tvoje skore je "+gameScore+".");
 
-                scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
-
-                System.out.println("Top 5 hracov:");
-                for (int i = 0; i < scores.size(); i++) {
-                    System.out.println((i + 1) + ". " +scores.get(i));
-                }
-
-                System.out.println("Zanechaj komentar k tvojej hre: ");
-                var userComment = readLine();
-                System.out.println();
-
-                commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
-
-                System.out.println("Poslednych 5 komentarov:");
-                for (int i = 0; i < comments.size(); i++) {
-                    System.out.println((i + 1) + ". " +comments.get(i));
-                }
+                score();
+                comment();
+                rating();
 
                 break;
             }
@@ -124,23 +102,9 @@ public class ConsoleUI implements UserInterface {
                 gameScore=this.field.getScore();
                 System.out.println(userName+", vyhral si. Tvoje skore je "+gameScore+".");
 
-                scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
-
-                System.out.println("Top 5 hracov:");
-                for (int i = 0; i < scores.size(); i++) {
-                    System.out.println((i + 1) + ". " +scores.get(i));
-                }
-
-                System.out.println("Zanechaj komentar k tvojej hre: ");
-                var userComment = readLine();
-                System.out.println();
-
-                commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
-
-                System.out.println("Poslednych 5 komentarov:");
-                for (int i = 0; i < comments.size(); i++) {
-                    System.out.println((i + 1) + ". " +comments.get(i));
-                }
+                score();
+                comment();
+                rating();
 
                 System.out.println(
                         Minesweeper.getInstance().getBestTimes()
@@ -150,6 +114,57 @@ public class ConsoleUI implements UserInterface {
         } while (true);
         System.exit(0);
 
+    }
+
+    public void score() {
+        int gameScore = 0;
+
+        ScoreService scoreService = new ScoreServiceJDBC();
+        var scores = scoreService.getBestScores("minesweeper");
+
+        scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+
+        System.out.println("Top 5 hracov:");
+        for (int i = 0; i < scores.size(); i++) {
+            System.out.println((i + 1) + ". " +scores.get(i));
+        }
+    }
+
+    public void comment() {
+        CommentService commentService = new CommentServiceJDBC();
+        var comments = commentService.getComments("minesweeper");
+
+        System.out.println("Zanechaj komentar k tvojej hre: ");
+        var userComment = readLine();
+        System.out.println();
+
+        commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
+
+        System.out.println("Poslednych 5 komentarov:");
+        for (int i = 0; i < comments.size(); i++) {
+            System.out.println((i + 1) + ". " +comments.get(i));
+        }
+    }
+
+    public void rating() {
+
+        RatingService ratingService = new RatingServiceJDBC();
+
+        System.out.println("Zanechaj hodnotenie k tvojej hre: ");
+
+        boolean checker = true;
+        while(checker) {
+            var userRating = readLine();
+            if(Integer.parseInt(userRating) >= 1 && Integer.parseInt(userRating) <= 5) {
+                ratingService.setRating(new Rating("minesweeper", userName, Integer.parseInt(userRating), new Date()));
+                checker = false;
+            }
+            System.out.println("Nespravne hodnotenie. Zadaj hodnotenie este raz(1-5)");
+        }
+
+        var ratings = ratingService.getRating("minesweeper", userName);
+
+        System.out.println("Hru si hodnotil " +ratings+ "*");
     }
 
     /**
