@@ -32,14 +32,14 @@ public class RatingServiceTest {
         assertEquals((5+1+4)/3,ratingService.getAverageRating("minesweeper"));
     }
 
-//    @Test
-//    public void Duplicity() {
-//        ratingService.reset();
-//        var date = new Date();
-//        ratingService.setRating(new Rating("minesweeper", "Peto", 5, date));
-//        ratingService.setRating(new Rating("minesweeper", "Peto", 2, date));
-//        assertEquals(1,);
-//    }
+    @Test
+    public void Duplicity() {
+        ratingService.reset();
+        var date = new Date();
+        ratingService.setRating(new Rating("minesweeper", "Peto", 5, date));
+        ratingService.setRating(new Rating("minesweeper", "Peto", 2, date));
+        assertEquals(2,ratingService.getRating("minesweeper", "Peto"));
+    }
 
 
 }

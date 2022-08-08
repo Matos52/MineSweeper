@@ -1,9 +1,6 @@
-package minesweeper;
-
-import minesweeper.core.Field;
+package minesweeper.consoleui;
 
 import java.io.*;
-import java.util.Objects;
 
 public class Settings implements Serializable {
 

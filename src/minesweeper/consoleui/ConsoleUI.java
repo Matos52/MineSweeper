@@ -3,8 +3,6 @@ package minesweeper.consoleui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.SQLOutput;
-import java.text.NumberFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +11,6 @@ import entity.Comment;
 import entity.Rating;
 import entity.Score;
 import minesweeper.Minesweeper;
-import minesweeper.Settings;
 import minesweeper.core.Field;
 import minesweeper.core.GameState;
 import minesweeper.core.Tile;
@@ -38,6 +35,10 @@ public class ConsoleUI implements UserInterface {
      * name of the player
      */
     private String userName ="";
+
+    private Settings setting;
+
+    private static final String GAME = "minesweeper";
 
     /**
      * Reads line of text from the reader.
@@ -76,7 +77,8 @@ public class ConsoleUI implements UserInterface {
                     case 3 -> Settings.EXPERT;
                     default -> Settings.BEGINNER;
                 };
-                Minesweeper.getInstance().setSetting(s);
+                this.setting = s;
+                this.setting.save();
                 this.field = new Field(s.getRowCount(), s.getColumnCount(), s.getMineCount());
             } catch (NumberFormatException e) {
                 //empty naschval
@@ -91,27 +93,17 @@ public class ConsoleUI implements UserInterface {
 
             if (fieldState == GameState.FAILED) {
                 System.out.println(userName+", odkryl si minu. Prehral si. Tvoje skore je "+gameScore+".");
-
-                score();
-                comment();
-                rating();
-
                 break;
             }
             if (fieldState == GameState.SOLVED) {
                 gameScore=this.field.getScore();
                 System.out.println(userName+", vyhral si. Tvoje skore je "+gameScore+".");
-
-                score();
-                comment();
-                rating();
-
-                System.out.println(
-                        Minesweeper.getInstance().getBestTimes()
-                );
                 break;
             }
         } while (true);
+        handlerComment();
+        handlerRating();
+        score();
         System.exit(0);
 
     }
@@ -120,9 +112,9 @@ public class ConsoleUI implements UserInterface {
         int gameScore = 0;
 
         ScoreService scoreService = new ScoreServiceJDBC();
-        var scores = scoreService.getBestScores("minesweeper");
+        var scores = scoreService.getBestScores(GAME);
 
-        scoreService.addScore(new Score("minesweeper", userName, gameScore, new Date()));
+        scoreService.addScore(new Score(GAME, userName, gameScore, new Date()));
 
         System.out.println("Top 5 hracov:");
         for (int i = 0; i < scores.size(); i++) {
@@ -130,15 +122,39 @@ public class ConsoleUI implements UserInterface {
         }
     }
 
-    public void comment() {
+    private void handlerComment() {
+        try {
+            comment();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            handlerComment();
+        }
+    }
+
+    private void handlerRating() {
+        try {
+            rating();
+
+        } catch (NumberFormatException e) {
+            System.out.println("Musi zadat len cislo, nie text.");
+            handlerRating();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            handlerRating();
+        }
+    }
+
+    public void comment() throws GameStudioException {
         CommentService commentService = new CommentServiceJDBC();
+
         var comments = commentService.getComments("minesweeper");
 
         System.out.println("Zanechaj komentar k tvojej hre: ");
-        var userComment = readLine();
-        System.out.println();
-
-        commentService.addComment(new Comment("minesweeper", userName, userComment, new Date()));
+        String userComment = readLine();
+        if(userComment.length() > 1000 || userComment.length() == 0) {
+            throw new GameStudioException("Komentar je prilis dlhy alebo prilis kratky.");
+        }
+        commentService.addComment(new Comment(GAME, userName, userComment, new Date()));
 
         System.out.println("Poslednych 5 komentarov:");
         for (int i = 0; i < comments.size(); i++) {
@@ -146,24 +162,19 @@ public class ConsoleUI implements UserInterface {
         }
     }
 
-    public void rating() {
+    public void rating() throws GameStudioException {
 
         RatingService ratingService = new RatingServiceJDBC();
-
         System.out.println("Zanechaj hodnotenie k tvojej hre: ");
 
-        boolean checker = true;
-        while(checker) {
-            var userRating = readLine();
-            if(Integer.parseInt(userRating) >= 1 && Integer.parseInt(userRating) <= 5) {
-                ratingService.setRating(new Rating("minesweeper", userName, Integer.parseInt(userRating), new Date()));
-                checker = false;
-            } else {
-                System.out.println("Nespravne hodnotenie. Zadaj hodnotenie este raz(1-5)");
-            }
+        String userRating = readLine();
+        if(Integer.parseInt(userRating) < 1 || Integer.parseInt(userRating) > 5) {
+            throw new GameStudioException("Nespravne hodnotenie. Zadaj hodnotenie este raz(1-5)");
         }
 
-        var ratings = ratingService.getRating("minesweeper", userName);
+        ratingService.setRating(new Rating(GAME, userName, Integer.parseInt(userRating), new Date()));
+
+        var ratings = ratingService.getRating(GAME, userName);
 
         System.out.println("Hru si hodnotil " +ratings+ "*");
     }
@@ -194,8 +205,18 @@ public class ConsoleUI implements UserInterface {
             }
             System.out.println();
         }
+    }
 
+    @Override
+    public void play() {
+        setting = Settings.load();
 
+        Field field = new Field(
+                setting.getRowCount(),
+                setting.getColumnCount(),
+                setting.getMineCount()
+        );
+        newGameStarted(field);
     }
 
     /**
@@ -207,7 +228,7 @@ public class ConsoleUI implements UserInterface {
         System.out.println("Ocakavany vstup:  X - ukoncenie hry, M - mark, O - open, U - unmark. Napr.: MA1 - oznacenie dlazdice v riadku A a stlpci 1");
         String playerInput = readLine();
 
-        if(playerInput.trim().equals('X')) {
+        if(playerInput.trim().equals("X")) {
             System.out.println("Ukoncujem hru");
             System.exit(0);
         }
