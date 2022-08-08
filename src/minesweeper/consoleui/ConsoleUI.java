@@ -158,8 +158,9 @@ public class ConsoleUI implements UserInterface {
             if(Integer.parseInt(userRating) >= 1 && Integer.parseInt(userRating) <= 5) {
                 ratingService.setRating(new Rating("minesweeper", userName, Integer.parseInt(userRating), new Date()));
                 checker = false;
+            } else {
+                System.out.println("Nespravne hodnotenie. Zadaj hodnotenie este raz(1-5)");
             }
-            System.out.println("Nespravne hodnotenie. Zadaj hodnotenie este raz(1-5)");
         }
 
         var ratings = ratingService.getRating("minesweeper", userName);

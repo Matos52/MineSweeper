@@ -23,28 +23,59 @@ public class RatingServiceJDBC implements RatingService {
     private static final String JDBC_PASSWORD = "postgres";
 
     private static final String STATEMENT_SET_RATING = "INSERT INTO rating VALUES(?,?,?,?)";
-    private static final String STATEMENT_RATINGS = "SELECT game, username, rating, rated_on FROM rating WHERE game = ? ORDER BY rating DESC LIMIT 5";
     private static final String STATEMENT_RESET = "DELETE FROM rating";
     private static final String STATEMENT_GET_RATING = "SELECT rating FROM rating WHERE game = ? AND username = ?";
     private static final String STATEMENT_AVG_RATING = "SELECT ROUND(AVG(rating)) FROM rating WHERE game = ?";
+    private static final String STATEMENT_UPDATE_RATING = "UPDATE rating SET rating=?, rated_on=? WHERE game=? AND username=?";
+    private static final String STATEMENT_SELECT_RATING = "SELECT FROM rating WHERE game=? AND username=?";
 
-    private static final String STATEMENT_CHECK_RATING = "SELECT rating FROM rating";
+    private void updateRating(Rating rating) {
+        try (var connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+             var statement = connection.prepareStatement(STATEMENT_UPDATE_RATING))
+        {
+            statement.setInt(1, rating.getRating());
+            statement.setTimestamp(2, new Timestamp(rating.getRatedOn().getTime()));
+            statement.setString(3, rating.getGame());
+            statement.setString(4, rating.getUserName());
 
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new GameStudioException(e);
+        }
+    }
 
-
-    public void setRating(Rating rating) {
-
-        try( var connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-             var statement = connection.prepareStatement(STATEMENT_SET_RATING);
-        ) {
-
+    private void setNewRating(Rating rating) {
+        try (var connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+             var statement = connection.prepareStatement(STATEMENT_SET_RATING))
+        {
             statement.setString(1, rating.getGame());
             statement.setString(2, rating.getUserName());
             statement.setInt(3, rating.getRating());
             statement.setTimestamp(4, new Timestamp(rating.getRatedOn().getTime()));
-            statement.executeUpdate();
 
-        } catch (Exception e) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new GameStudioException(e);
+        }
+    }
+
+
+
+    public void setRating(Rating rating) {
+        try (var connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+             var statement = connection.prepareStatement(STATEMENT_SELECT_RATING))
+        {
+            statement.setString(1, rating.getGame());
+            statement.setString(2, rating.getUserName());
+
+            try (var rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    updateRating(rating);
+                } else {
+                    setNewRating(rating);
+                }
+            }
+        } catch (SQLException e) {
             throw new GameStudioException(e);
         }
     }
